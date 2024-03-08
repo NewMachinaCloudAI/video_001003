@@ -1,0 +1,66 @@
+body {
+    background-color: white;
+  }
+
+.evenrowquestion {
+    background-color: #fff5ee;
+    color: black;
+    border-style: solid;
+    border-color: white;
+    border-top-width: 5px;
+    border-right-width: 10px;
+    border-left-width: 10px;
+    border-bottom-width: 2px;
+}
+
+.evenrowanswer {
+    background-color: #fff5ee;
+    color: black;
+    border-style: solid;
+    border-color: white;
+    border-top-width: 2px;
+    border-right-width: 10px;
+    border-left-width: 10px;
+    border-bottom-width: 5px;
+}
+
+.oddrowquestion {
+    background-color: #f0fff0;
+    color: black;
+    border-style: solid;
+    border-color: white;
+    border-top-width: 5px;
+    border-right-width: 10px;
+    border-left-width: 10px;
+    border-bottom-width: 2px;
+}
+
+.oddrowanswer {
+    background-color: #f0fff0;
+    color: black;
+    border-style: solid;
+    border-color: white;
+    border-top-width: 2px;
+    border-right-width: 10px;
+    border-left-width: 10px;
+    border-bottom-width: 5px;
+}
+
+.titleText {
+    color: black;
+    font-size:larger
+}
+
+.conversationHistory {
+    color: black;
+}
+
+.versionText {
+    color: black;
+    font-size:smaller;
+}
+
+.conversationText {
+    color: black;
+    font-size:medium;
+}

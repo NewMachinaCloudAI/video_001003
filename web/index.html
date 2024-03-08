@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="website.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
+            function fillTableWithResults(data){
+                document.getElementById("conversationHistory").innerHTML = "";
+                var $conversationHistoryElement = $('#conversationHistory')
+                var conversationItem = ''; 
+                var count = 1;
+                var questionBackgroundStyle = "oddrowquestion";
+                var answerBackgroundStyle = "oddrowanswer";
+                var listSize = data.length
+                if ( listSize > 0 ){
+                    $.each(data, function (key, value) { 
+                                
+                        // figure even/odd row for color background
+                        if (count % 2 == 0) {
+                            questionBackgroundStyle = "evenrowquestion";
+                            answerBackgroundStyle = "evenrowanswer"
+                        }
+                        else{
+                            questionBackgroundStyle = "oddrowquestion";
+                            answerBackgroundStyle = "oddrowanswer"
+                        }
+    
+                        conversationItem += '<div class="'+questionBackgroundStyle+'">'; 
+                        conversationItem += '<b>[' +  value.userKey + ']</b> '; 
+                        conversationItem += value.question; 
+                        conversationItem += '</div>';
+                        conversationItem += '<div class="'+answerBackgroundStyle+'">'; 
+                        conversationItem += '<b>[ChatGpt]</b> '; 
+                        conversationItem += value.answer ; 
+                        conversationItem += '</div>'; 
+
+                        count += 1;
+
+                        $conversationHistoryElement.append( conversationItem );
+                        conversationItem = '';
+                    }) 
+                }
+                else {
+                        conversationItem += '<div class="'+questionBackgroundStyle+'">'; 
+                        conversationItem += 'No Conversation History between webSiteUser and ChatGPT'; 
+                        conversationItem += '</div>';
+                        $conversationHistoryElement.append( conversationItem );
+                }
+            }
+
+            $(document).ready( function(){
+                $("#getConversationHistoryButton").click( function(){
+                    restApiUrl = "https://qdtm3ntebf.execute-api.us-east-1.amazonaws.com/dev/chat?userKey=websiteUser1"
+                    $.ajax({
+                        url: restApiUrl,
+                        dataType: "json",
+                        type: "GET",
+                        contentType: "application/json",
+                        success: function(data){
+                            fillTableWithResults(data)
+                        },
+                        error: function(response){
+                            alert( "AJAX Error: ErrorCode=" + response.status + "   ErrorDescription=" + response.statusText )
+                        }
+                    })
+                })
+
+                $("#askQuestionButton").click( function(){
+                    userKey = 'websiteUser1'
+                    chatQuestion = $('#chatQuestion').val()
+                    inputData = {
+                        "userKey" : userKey,
+                        "chatQuestion" : chatQuestion
+                    };
+                    restApiUrl = "https://qdtm3ntebf.execute-api.us-east-1.amazonaws.com/dev/chat"
+                    $.ajax({
+                        url: restApiUrl,
+                        type: "POST",
+                        data: JSON.stringify(inputData),
+                        success: function(data){
+                            fillTableWithResults(data)
+                            $('#chatQuestion').val('')
+                        },
+                        error: function(response){
+                            alert( "AJAX Error: ErrorCode=" + response.status + "   ErrorDescription=" + response.statusText )
+                            $('#chatQuestion').val('')
+                        }
+                    })
+                })
+            })
+        </script>
+    </head>
+    <body>
+        <div class='titleText'>Your Custom Website + ChatGPT API</div>
+        <div class='versionText'>Version 58</div>
+        <div>&nbsp;</div>
+        <div>&nbsp;</div>
+        <button id="getConversationHistoryButton">Get Conversation History</button>
+        <div>&nbsp;</div>
+        <div id='conversationHistory' class='conversationText'> 
+        </div>
+        <div>&nbsp;</div>
+        <div><input type="text" id="chatQuestion" size="100"></div>
+        <button id="askQuestionButton">Ask ChatGPT a Question</button>
+        <div>&nbsp;</div>
+    </body>
+</html>
