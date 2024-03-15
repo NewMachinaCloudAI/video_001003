@@ -8,22 +8,24 @@ from boto3.dynamodb.conditions import Key
 HTTP_GET_METHOD = 'GET'
 HTTP_POST_METHOD = 'POST'
 
+SECRET_NAME = "<YOUR-SECRET-NAME>"
+SECRET_KEY = "<YOUR-SECRET-KEY>"
+REGION_NAME = "<YOUR-REGION>"
+
+DYNAMO_DB_TABLE = '<YOUR-DYNAMODB-TABLE-NAME>'
+
 # Secrets Manager
 def get_secret_api_key():
-    secret_name = "prod/api/key/chatgpt"
-    secret_key = "api-key-chatgpt"
-    region_name = "us-east-1"
-
     # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(
         service_name='secretsmanager',
-        region_name=region_name
+        region_name=REGION_NAME
     )
 
     try:
         get_secret_value_response = client.get_secret_value(
-            SecretId=secret_name
+            SecretId=SECRET_NAME
         )
     except ClientError as e:
         # For a list of exceptions thrown, see
@@ -33,7 +35,7 @@ def get_secret_api_key():
     # Decrypts secret using the associated KMS key.
     secret_response = get_secret_value_response[ 'SecretString' ]
     secret_object = json.loads(secret_response) 
-    secret_api_key = secret_object['api-key-chatgpt']
+    secret_api_key = secret_object[SECRET_KEY]
     
     # Return secret
     return secret_api_key
@@ -50,7 +52,7 @@ def mask_value(str):
 # DynamoDb
 def get_conversation_history(user_key):
     dynamoDb = boto3.resource('dynamodb')
-    table = dynamoDb.Table('Video-000200-UserConversation')
+    table = dynamoDb.Table(DYNAMO_DB_TABLE)
     response = table.query(
         KeyConditionExpression=Key('userKey').eq(user_key)
     )
@@ -65,7 +67,7 @@ def save_conversation_history(user_key,question,answer):
     item_object['question'] = question
     item_object['answer'] = answer
     dynamoDb = boto3.resource('dynamodb')
-    table = dynamoDb.Table('Video-000200-UserConversation')
+    table = dynamoDb.Table(DYNAMO_DB_TABLE)
     response = table.put_item( Item=item_object )
     
 def build_payload(next_question,user_conversation_items):
@@ -151,7 +153,7 @@ def handle_post_request(event):
 
     # make request to ChatGPT and get response
     http = urllib3.PoolManager()
-    response = http.request('POST',
+    response = http.request( HTTP_POST_METHOD,
                              OPEN_AI_CHATGPT_URL,
                              headers=HEADERS,
                              body=encoded_payload)
@@ -194,7 +196,9 @@ def lambda_handler(event, context):
     return {
         'statusCode': 200,
         "headers": {
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
         },
         'body': json.dumps(user_conversation_items)
     }
