@@ -50,7 +50,7 @@
 
             $(document).ready( function(){
                 $("#getConversationHistoryButton").click( function(){
-                    restApiUrl = "https://qdtm3ntebf.execute-api.us-east-1.amazonaws.com/dev/chat?userKey=websiteUser1"
+                    restApiUrl = "<API-GATEWAY-ENDPOING-BASE-URL-PREFIX>/chat?userKey=websiteUser1"
                     $.ajax({
                         url: restApiUrl,
                         dataType: "json",
@@ -72,7 +72,7 @@
                         "userKey" : userKey,
                         "chatQuestion" : chatQuestion
                     };
-                    restApiUrl = "https://qdtm3ntebf.execute-api.us-east-1.amazonaws.com/dev/chat"
+                    restApiUrl = "<API-GATEWAY-ENDPOING-BASE-URL-PREFIX>/chat"
                     $.ajax({
                         url: restApiUrl,
                         type: "POST",
